@@ -27,5 +27,8 @@ export url='<url-to-be-processed>'
 * Run the python Script
 python3 main.py
 
-# Output:
-The result can be seen in the log file.
+# How to Test:
+* The testcases are very well compatible with nosetest framework
+```
+nosetests test.py
+```

@@ -1,19 +1,25 @@
+import json
 import os
 from urllib.request import urlopen, urlparse
 from bs4 import BeautifulSoup
 from collections import Counter
 import logging
+import sys
 
 MAX_URL_DEPTH = 4
 visited_links = {}      # Maintains the array of all the visited links for avoiding duplicacy
-domain = urlparse(os.getenv('url')).netloc
+domain = None
 
-logging.basicConfig(filename="main.log",
-                    format='%(asctime)s | %(levelname)s | %(message)s',
-                    filemode='w')
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
+handler = logging.StreamHandler(sys.stdout)
+fhandler = logging.FileHandler("main.log")
+handler.setLevel(logging.DEBUG)
+fhandler.setLevel(logging.DEBUG)
+handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)s | %(message)s"))
+fhandler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)s | %(message)s"))
+logger.addHandler(handler)
+logger.addHandler(fhandler)
+logger.setLevel(logging.DEBUG)
 
 def filter_link(link):
     """
@@ -59,15 +65,13 @@ def process_url(url, level):
                 pair = "{} {}".format(prev_word, word)
                 word_pairs[pair] = word_pairs.get(pair, 0) + 1
             prev_word = word
-    print(lines)
 
     visited_links[url] = None
     if level < MAX_URL_DEPTH:
         links = [link.get('href') for link in soup.findAll('a')]
         links = list(filter(filter_link, links))
         visited_links.update({l: None for l in links})
-        print(links)
-        print(" LEVEL = {}".format(level))
+        logger.debug(" LEVEL = {}".format(level))
         for link in links:
             logger.info("Processing started for level: {}, for URL: {}".format(level, link))
             counters = process_url(link, level+1)
@@ -75,12 +79,16 @@ def process_url(url, level):
 
     return((Counter(words), Counter(word_pairs)))
 
+def top_ten_pairs(url):
+    global domain
+    domain = urlparse(url).netloc
+    words_count, word_pair_count = process_url(url, 0)
+    sorted_words = sorted(words_count.items(), key=lambda kv: kv[1], reverse=True)
+    sorted_word_pairs = sorted(word_pair_count.items(), key=lambda kv: kv[1], reverse=True)
+    return sorted_word_pairs[:9], sorted_words[:9],
 
 if __name__ == '__main__':
     logger.info("Process started with root URL as: {}".format(os.getenv('url')))
-    words_count, word_pair_count = process_url(os.getenv('url').strip('/'), 0)
-    sorted_words = sorted(words_count.items(), key=lambda kv: kv[1], reverse=True)
-    sorted_word_pairs = sorted(word_pair_count.items(), key=lambda kv: kv[1], reverse=True)
-    logger.info("Top ten words pairs with there frequencies are: ".format(sorted_word_pairs[:9]))
-    logger.info("\r\n")
-    logger.info("Top ten individual words with there frequencies are: ".format(sorted_words[:9]))
+    result = top_ten_pairs(os.getenv('url').strip('/'))
+    logger.info("Top ten words pairs with there frequencies are: {}".format(json.dumps(result[0][:9])))
+    logger.info("Top ten individual words with there frequencies are: {}".format(json.dumps(result[1][:9])))
