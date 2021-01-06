@@ -88,7 +88,8 @@ def top_ten_pairs(url):
     return sorted_word_pairs[:9], sorted_words[:9],
 
 if __name__ == '__main__':
-    logger.info("Process started with root URL as: {}".format(os.getenv('url')))
-    result = top_ten_pairs(os.getenv('url').strip('/'))
+    url = 'https://www.314e.com/'
+    logger.info("Process started with root URL as: {}".format(url))
+    result = top_ten_pairs(url.strip('/'))
     logger.info("Top ten words pairs with there frequencies are: {}".format(json.dumps(result[0][:9])))
     logger.info("Top ten individual words with there frequencies are: {}".format(json.dumps(result[1][:9])))

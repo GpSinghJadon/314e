@@ -4,26 +4,19 @@ PYTHON = python3
 
 help:
 	@echo "---------------HELP-----------------"
-	@echo "To setup the project type make setup"
+	@echo "To setup thess project type make setup"
 	@echo "To test the project type make test"
 	@echo "To run the project type make run"
 	@echo "------------------------------------"
 
-setup:
-	@echo "Checking if project files are generated..."
-	sudo apt update
-    sudo apt install software-properties-common
-    sudo add-apt-repository ppa:deadsnakes/ppa
-    sudo apt update
-    sudo apt install ${PYTHON}
-    sudo apt-get install python3-pip
-    pipenv install
+install:
+	@echo "Installing dependencies"
+	pipenv install
 
 test:
 	pipenv run nosetests test.py
 
 run:
-    export url='https://www.314e.com/'
 	pipenv run python main.py
 
 clean:

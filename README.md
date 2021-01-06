@@ -15,20 +15,36 @@ sudo apt install python3.8
 sudo apt-get install python3-pip
 pip3 install pipenv
 ```
-* Install Dependencies
+# Install Dependencies
 ```
 pipenv install
 ```
 # How to Run:
-* Setup environment variable so that the root URL is available as an environment variable:
+### Run using python script
+Setup environment variable so that the root URL is available as an environment variable:
 ```
 export url='<url-to-be-processed>'
 ```
-* Run the python Script
-python3 main.py
+Run the python script using the below command
+```
+python3 main.py 
+```
 
+### Run using Make command
+
+This will run using the default URL = 'https://www.314e.com/'
+```
+make run
+```
 # How to Test:
-* The testcases are very well compatible with nosetest framework
+
+The testcases are very well compatible with nosetest framework.
+
+### To run testsuit using nosetests use the below command:
 ```
 nosetests test.py
+```
+### The test cases can also be ran by the below make command
+```
+make test
 ```
